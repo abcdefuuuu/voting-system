@@ -88,7 +88,4 @@ a {
   color: #42b983;
 }
 </style>
-<script setup>
-</script>
-<script setup>
-</script>
+
