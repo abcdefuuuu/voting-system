@@ -34,7 +34,6 @@ export default {
   methods: {
     ...mapActions(['login']),
     async login() {
-      console.log("登入");
       const user = users.find(
           (user) => user.username === this.username && user.password === this.password
       );
