@@ -1,98 +1,97 @@
 <template>
-  <div class="admin-panel">
-    <h1>管理投票項目</h1>
-    <ul>
-      <li v-for="item in votingItems" :key="item.id">
-        {{ item.title }}
-        <button @click="deleteItem(item.id)">刪除</button>
-      </li>
-    </ul>
-    <form @submit.prevent="addItem">
-      <input v-model="newItemTitle" placeholder="新投票項目名稱" />
-      <button type="submit">新增項目</button>
-    </form>
-  </div>
+    <div class="hello">
+        <h1>管理投票項目</h1>
+        <ul>
+            <li v-for="item in votingItems" :key="item.id">
+                {{ item.name }}
+                <button @click="deleteItem(item.id)">刪除</button>
+            </li>
+        </ul>
+        <form @submit.prevent="addItem">
+            <input v-model="newItemTitle" placeholder="新投票項目名稱" />
+            <button type="submit">新增項目</button>
+        </form>
+    </div>
 </template>
 
 <script>
 export default {
-  name: 'AdminPanel',
-  data() {
-    return {
-      votingItems: [],  // 存放投票項目的假資料
-      newItemTitle: '', // 新增投票項目的標題
-    };
-  },
-  methods: {
-    // 模擬從 API 獲取投票項目
-    fetchVotingItems() {
-      setTimeout(() => {
-        this.votingItems = [
-          { id: 1, title: '選項 A' },
-          { id: 2, title: '選項 B' },
-          { id: 3, title: '選項 C' },
-        ];
-      }, 1000); // 1秒延遲
+    name: 'HelloWorld',
+    data() {
+        return {
+            votingItems: [],
+            newItemTitle: '',
+        };
     },
-    // 模擬新增投票項目
-    addItem() {
-      if (this.newItemTitle.trim() === '') {
-        alert('請輸入投票項目名稱');
-        return;
-      }
+    methods: {
+        async fetchVotingItems() {
+            try {
+                const response = await fetch('/api/voting/items'); // 正確的API端點
+                if (response.ok) {
+                    this.votingItems = await response.json();
+                } else {
+                    console.error('Failed to fetch voting items');
+                }
+            } catch (error) {
+                console.error('Error fetching voting items:', error);
+            }
+        },
+        async addItem() {
+            const newItem = {
+                name: this.newItemTitle, // 使用 'name' 字段來匹配後端
+            };
 
-      const newItem = {
-        id: this.votingItems.length + 1, // 模擬 ID
-        title: this.newItemTitle,
-      };
+            try {
+                const response = await fetch('/api/voting/items', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(newItem),
+                });
 
-      setTimeout(() => {
-        this.votingItems.push(newItem);
-        this.newItemTitle = '';
-      }, 1000); // 1秒延遲
+                if (response.ok) {
+                    const data = await response.json();
+                    this.votingItems.push(data); // 添加新項目到列表
+                    this.newItemTitle = ''; // 清空輸入框
+                } else {
+                    console.error('Failed to add new voting item');
+                }
+            } catch (error) {
+                console.error('Error adding new voting item:', error);
+            }
+        },
+        async deleteItem(id) {
+            try {
+                const response = await fetch(`/api/voting/items/${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    this.votingItems = this.votingItems.filter(item => item.id !== id); // 刪除項目
+                } else {
+                    console.error('Failed to delete voting item');
+                }
+            } catch (error) {
+                console.error('Error deleting voting item:', error);
+            }
+        },
     },
-
-    // 模擬刪除投票項目
-    deleteItem(id) {
-      if (confirm('確定要刪除這個項目嗎?')) {
-        setTimeout(() => {
-          this.votingItems = this.votingItems.filter(item => item.id !== id);
-        }, 1000); // 1秒延遲
-      }
+    mounted() {
+        this.fetchVotingItems(); // 組件掛載時獲取投票項目
     },
-  },
-  mounted() {
-    this.fetchVotingItems();
-  },
 };
 </script>
 
 <style scoped>
-.admin-panel {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
-
-h1 {
-  margin-bottom: 20px;
-}
-
 ul {
-  list-style-type: none;
-  padding: 0;
+    list-style-type: none;
+    padding: 0;
 }
-
 li {
-  margin-bottom: 10px;
+    margin: 10px 0;
 }
-
 button {
-  margin-left: 10px;
-}
-
-input {
-  margin-right: 10px;
+    margin-left: 10px;
 }
 </style>
