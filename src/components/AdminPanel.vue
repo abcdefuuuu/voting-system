@@ -1,91 +1,98 @@
 <template>
-    <div class="hello">
-        <h1>管理投票項目</h1>
-        <ul>
-            <li v-for="item in votingItems" :key="item.id">
-                {{ item.title }}
-                <button @click="editItem(item.id)">編輯</button>
-                <button @click="deleteItem(item.id)">刪除</button>
-            </li>
-        </ul>
-        <form @submit.prevent="addItem">
-            <input v-model="newItemTitle" placeholder="新投票項目名稱" />
-            <button type="submit">新增項目</button>
-        </form>
-    </div>
+  <div class="admin-panel">
+    <h1>管理投票項目</h1>
+    <ul>
+      <li v-for="item in votingItems" :key="item.id">
+        {{ item.title }}
+        <button @click="deleteItem(item.id)">刪除</button>
+      </li>
+    </ul>
+    <form @submit.prevent="addItem">
+      <input v-model="newItemTitle" placeholder="新投票項目名稱" />
+      <button type="submit">新增項目</button>
+    </form>
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'HelloWorld',
+  name: 'AdminPanel',
   data() {
-      return {
-          votingItems: [],
-          newItemTitle: '',
-      };
+    return {
+      votingItems: [],  // 存放投票項目的假資料
+      newItemTitle: '', // 新增投票項目的標題
+    };
   },
   methods: {
-      fetchVotingItems() {
-          // 假設從API獲取投票項目
-          // fetch('/api/voting-items')
-          //     .then(response => response.json())
-          //     .then(data => {
-          //         this.votingItems = data;
-          //     });
-      },
-      addItem() {
-          const newItem = {
-              title: this.newItemTitle,
-          };
-          // 假設使用 POST 請求來新增項目
-          fetch('/api/voting-items', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(newItem),
-          })
-              .then(response => response.json())
-              .then(data => {
-                  this.votingItems.push(data);
-                  this.newItemTitle = '';
-              });
-      },
-      editItem(id) {
-          // 假設跳轉到編輯頁面或使用模態框進行編輯
-          alert(`編輯項目: ${id}`);
-      },
-      deleteItem(id) {
-          // 假設使用 DELETE 請求刪除項目
-          fetch(`/api/voting-items/${id}`, {
-              method: 'DELETE',
-          }).then(() => {
-              this.votingItems = this.votingItems.filter(item => item.id !== id);
-          });
-      },
+    // 模擬從 API 獲取投票項目
+    fetchVotingItems() {
+      setTimeout(() => {
+        this.votingItems = [
+          { id: 1, title: '選項 A' },
+          { id: 2, title: '選項 B' },
+          { id: 3, title: '選項 C' },
+        ];
+      }, 1000); // 1秒延遲
+    },
+    // 模擬新增投票項目
+    addItem() {
+      if (this.newItemTitle.trim() === '') {
+        alert('請輸入投票項目名稱');
+        return;
+      }
+
+      const newItem = {
+        id: this.votingItems.length + 1, // 模擬 ID
+        title: this.newItemTitle,
+      };
+
+      setTimeout(() => {
+        this.votingItems.push(newItem);
+        this.newItemTitle = '';
+      }, 1000); // 1秒延遲
+    },
+
+    // 模擬刪除投票項目
+    deleteItem(id) {
+      if (confirm('確定要刪除這個項目嗎?')) {
+        setTimeout(() => {
+          this.votingItems = this.votingItems.filter(item => item.id !== id);
+        }, 1000); // 1秒延遲
+      }
+    },
   },
   mounted() {
-      this.fetchVotingItems();
+    this.fetchVotingItems();
   },
-}
-
+};
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.admin-panel {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
 }
+
+h1 {
+  margin-bottom: 20px;
+}
+
 ul {
   list-style-type: none;
   padding: 0;
 }
+
 li {
-  display: inline-block;
-  margin: 0 10px;
+  margin-bottom: 10px;
 }
-a {
-  color: #42b983;
+
+button {
+  margin-left: 10px;
+}
+
+input {
+  margin-right: 10px;
 }
 </style>
-
